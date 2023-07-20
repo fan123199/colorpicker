@@ -3,29 +3,6 @@ plugins {
     id 'org.jetbrains.kotlin.android'
 }
 
-apply plugin: 'maven-publish'
-
-group = 'im.fdx' // 设置组名
-version = '1.0.0' // 设置版本号
-
-publishing {
-    publications {
-        maven(MavenPublication) {
-            groupId = group
-            artifactId = 'colorpicker' // 设置库名称
-            version = "1.0.0"
-            artifact sourcesJar // 如果您想发布源码，确保已经生成sourcesJar任务
-        }
-    }
-
-    repositories {
-        maven {
-            url '/path/to/local/repo' // 设置本地存储库路径
-        }
-    }
-}
-
-
 android {
     namespace 'im.fdx.colorpicker'
     compileSdk 33
