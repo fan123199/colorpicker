@@ -54,7 +54,7 @@ fun ColorWheel(
 
 
     val currentColor = Color.hsv(hue = hue1, saturation = saturation1, value = value, alpha = alpha)
-//    onColorChanged(currentColor, hue1, saturation1)
+    onColorChanged(currentColor, hue1, saturation1)
 
     var r = with(LocalDensity.current) {
         sliderHeight.toPx() /2
