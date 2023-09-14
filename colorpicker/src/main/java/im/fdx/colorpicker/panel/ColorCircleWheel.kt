@@ -20,9 +20,12 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.input.pointer.PointerInputChange
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.center
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.toOffset
 import im.fdx.colorpicker.hueColors
+import im.fdx.colorpicker.sliderHeight
 import kotlinx.coroutines.launch
 import kotlin.math.PI
 import kotlin.math.abs
@@ -51,8 +54,11 @@ fun ColorWheel(
 
 
     val currentColor = Color.hsv(hue = hue1, saturation = saturation1, value = value, alpha = alpha)
-    onColorChanged(currentColor, hue1, saturation1)
+//    onColorChanged(currentColor, hue1, saturation1)
 
+    var r = with(LocalDensity.current) {
+        sliderHeight.toPx() /2
+    }
     Canvas(modifier = modifier
         .onSizeChanged {
             if (point.value.x == -1f && point.value.y == -1f) {
@@ -129,7 +135,6 @@ fun ColorWheel(
             )
         )
 
-        val r = size.maxDimension / 40
         drawCircle(
             Color.White,
             radius = r * 0.8f,

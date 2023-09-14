@@ -16,6 +16,7 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
+import im.fdx.colorpicker.sliderHeight
 import kotlinx.coroutines.launch
 
 
@@ -45,13 +46,11 @@ fun ColorRectPanel(
     val point = remember {
         Animatable(Offset(-1f, -1f), Offset.VectorConverter)
     }
-//    var theSize by remember {
-//        mutableStateOf(IntSize.Zero)
-//    }
 
-//    var bitmap: ImageBitmap? = null
+    var r = with(LocalDensity.current) {
+        sliderHeight.toPx() /2
+    }
     val scope = rememberCoroutineScope()
-    val radiusPx = with(LocalDensity.current) { 1.dp.toPx() }
     Canvas(modifier = modifier
         .onSizeChanged {
             if (point.value.x == -1f && point.value.y == -1f) {
@@ -121,7 +120,7 @@ fun ColorRectPanel(
 
             blendMode = BlendMode.Multiply
         )
-        val r = size.maxDimension / 40
+
         drawCircle(
             Color.White,
             radius = r * 0.8f,

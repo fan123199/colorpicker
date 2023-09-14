@@ -16,6 +16,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.Center
 import androidx.compose.ui.Alignment.Companion.CenterHorizontally
+import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.*
@@ -55,7 +56,7 @@ fun ColorPickerRectHsvDialog(
             tonalElevation = 2.dp
         ) {
             Column(horizontalAlignment = CenterHorizontally) {
-                ColorPickerRectHsv(initColor) {
+                ColorPickerRectHsv(initColor = initColor) {
                     color = it
                 }
 
@@ -68,12 +69,12 @@ fun ColorPickerRectHsvDialog(
                     TextButton(
                         onClick = { onConfirm(initColor) },
                     ) {
-                        Text("CANCEL")
+                        Text(stringResource(id = android.R.string.cancel))
                     }
                     TextButton(
                         onClick = { onConfirm(color) },
                     ) {
-                        Text("SELECT")
+                        Text(stringResource(id = android.R.string.ok))
                     }
                 }
 
@@ -84,10 +85,11 @@ fun ColorPickerRectHsvDialog(
 }
 
 
+
 @Composable
 fun ColorPickerCircleHsvDialog(
     modifier: Modifier = Modifier,
-    initColor: Color = Color.Green,
+    initColor: Color,
     dialogShape: Shape = RoundedCornerShape(5.dp),
     dialogBackgroundColor: Color = MaterialTheme.colorScheme.surface,
     onConfirm: (Color) -> Unit = {}
@@ -106,8 +108,9 @@ fun ColorPickerCircleHsvDialog(
             shape = dialogShape,
             tonalElevation = 2.dp
         ) {
+
             Column(horizontalAlignment = CenterHorizontally) {
-                ColorPickerCircle(initColor) {
+                ColorPickerCircle(initColor = initColor) {
                     color = it
                 }
 
@@ -135,8 +138,10 @@ fun ColorPickerCircleHsvDialog(
 }
 
 
+//支持横屏dialog，避免裁剪
 @Composable
 fun ColorPickerCircle(
+    modifier: Modifier = Modifier,
     initColor: Color,
     showAlpha: Boolean = false,
     onColorChanged: (Color) -> Unit = {}
@@ -163,46 +168,97 @@ fun ColorPickerCircle(
         mutableStateOf(initColor)
     }
 
-    Column {
+    BoxWithConstraints(modifier) {
+        println("maxH $maxHeight,maxW $maxWidth,minH  $minHeight,minW  $minWidth")
+        if(maxHeight > 400.dp) {
+            Column {
 
-        ColorWheel(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp)
-                .aspectRatio(1f),
-            alpha = alpha,
-            hue = h,
-            saturation = s,
-            value = value,
-            onColorChanged = { it, h, s ->
-                color = it
-                hue = h
-                saturation = s
-                onColorChanged(color)
-            },
-        )
+                ColorWheel(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp)
+                        .aspectRatio(1f),
+                    alpha = alpha,
+                    hue = h,
+                    saturation = s,
+                    value = value,
+                    onColorChanged = { it, h, s ->
+                        color = it
+                        hue = h
+                        saturation = s
+                        onColorChanged(color)
+                    },
+                )
 
-        if(showAlpha) {
-            AlphaSlider(color, alpha) {
-                alpha = it
+                ValueSlider(
+                    hue = hue,
+                    saturation = saturation,
+                    value = value,
+                    onChanged = {
+                        value = it
+                    })
+
+                if (showAlpha) {
+                    AlphaSlider(color, alpha) {
+                        alpha = it
+                    }
+                }
+
+                Spacer(
+                    modifier = Modifier
+                        .align(CenterHorizontally)
+                        .background(color)
+                        .heightIn(36.dp)
+                        .width(100.dp),
+                )
+
+            }
+        } else {
+            Row(Modifier.height(IntrinsicSize.Max)) {
+
+                ColorWheel(
+                    modifier = Modifier
+                        .weight(1f)
+                        .padding(16.dp)
+                        .aspectRatio(1f, true),
+                    alpha = alpha,
+                    hue = h,
+                    saturation = s,
+                    value = value,
+                    onColorChanged = { it, h, s ->
+                        color = it
+                        hue = h
+                        saturation = s
+                        onColorChanged(color)
+                    },
+                )
+
+
+
+                ValueVerticalSlider(
+                    hue = hue,
+                    saturation = saturation,
+                    value = value,
+                    onChanged = {
+                        value = it
+                    })
+
+                if (showAlpha) {
+                    AlphaVerticalSlider(color, alpha) {
+                        alpha = it
+                    }
+                }
+
+                Spacer(
+                    modifier = Modifier
+                        .align(CenterVertically)
+                        .background(color)
+                        .size(36.dp),
+                )
+                Spacer(modifier = Modifier.width(16.dp))
+
             }
         }
-
-        ValueSlider(
-            hue = hue,
-            saturation = saturation,
-            value = value,
-            onChanged = {
-            value = it
-        })
-
-        Spacer(
-            modifier = Modifier
-                .align(CenterHorizontally)
-                .background(color)
-                .heightIn(36.dp).width(100.dp),
-        )
-
     }
 
 }
@@ -211,9 +267,11 @@ fun ColorPickerCircle(
 /**
  * Figma风格
  */
+// todo 还没实现支持横屏dialog，可以copy下
 @Composable
 fun ColorPickerRectHsv(
-    initColor: Color = Color.Green,
+    modifier: Modifier = Modifier,
+    initColor: Color,
     showAlpha: Boolean = false,
     onColorChanged: (Color) -> Unit = {}
 ) {
@@ -228,44 +286,97 @@ fun ColorPickerRectHsv(
         mutableStateOf(h)
     }
 
+    var saturation by remember {
+        mutableStateOf(s)
+    }
+
+    var value by remember {
+        mutableStateOf(v)
+    }
+
     //目前的设计是带alpha的color!!
     var color by remember {
         mutableStateOf(initColor)
     }
 
 
-    Column {
+    BoxWithConstraints(modifier) {
+        if(maxHeight > 400.dp) {
+            Column {
 
-        ColorRectPanel(modifier = Modifier
-            .fillMaxWidth()
-            .padding(16.dp)
-            .aspectRatio(1f),
-            alpha = alpha,
-            hue = hue,
-            saturation = s,
-            value = v,
-            onColorChanged = {
-                color = it
-                onColorChanged(color)
-            })
+                ColorRectPanel(modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp)
+                    .aspectRatio(1f),
+                    alpha = alpha,
+                    hue = hue,
+                    saturation = s,
+                    value = v,
+                    onColorChanged = {
+                        color = it
+                        onColorChanged(color)
+                    })
 
-        HueSlider(hue) {
-            hue = it
-        }
+                HueSlider(hue) {
+                    hue = it
+                }
 
-        if(showAlpha) {
-            AlphaSlider(color, alpha) {
-                alpha = it
+                if (showAlpha) {
+                    AlphaSlider(color, alpha) {
+                        alpha = it
+                    }
+                }
+
+                Spacer(
+                    modifier = Modifier
+                        .align(CenterHorizontally)
+                        .background(color)
+                        .heightIn(36.dp)
+                        .width(100.dp),
+                )
+
+            }
+        } else {
+
+            Row(Modifier.height(IntrinsicSize.Max)) {
+
+                ColorRectPanel(
+                    modifier = Modifier
+                        .weight(1f)
+                        .padding(16.dp)
+                        .aspectRatio(1f, true),
+                    alpha = alpha,
+                    hue = hue,
+                    saturation = s,
+                    value = v,
+                    onColorChanged = { it,->
+                        color = it
+                        onColorChanged(color)
+                    },
+                )
+
+
+
+                HueVerticalSlider(hue) {
+                    hue = it
+                }
+
+                if (showAlpha) {
+                    AlphaVerticalSlider(color, alpha) {
+                        alpha = it
+                    }
+                }
+
+                Spacer(
+                    modifier = Modifier
+                        .align(CenterVertically)
+                        .background(color)
+                        .size(36.dp),
+                )
+                Spacer(modifier = Modifier.width(16.dp))
+
             }
         }
-
-        Spacer(
-            modifier = Modifier
-                .align(CenterHorizontally)
-                .background(color)
-                .heightIn(36.dp).width(100.dp),
-        )
-
     }
 
 }

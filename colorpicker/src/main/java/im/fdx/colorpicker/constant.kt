@@ -13,4 +13,4 @@ val hueColors = arrayListOf(
     Color.Red,
 )
 
-val sliderHeight = 20.dp
+val sliderHeight = 16.dp

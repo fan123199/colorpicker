@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -32,7 +33,7 @@ fun AlphaSlider(
 ) {
 
     var innerAlpha by remember {
-        mutableStateOf(alpha)
+        mutableFloatStateOf(alpha)
     }
 
     Row(
@@ -53,15 +54,14 @@ fun AlphaSlider(
                 }
             }
             .padding(28.dp, 16.dp)
-            .height(sliderHeight)
-        ,
+            .height(sliderHeight),
         horizontalArrangement = Arrangement.Center
     ) {
         Canvas(modifier = Modifier
             .fillMaxHeight()
             .weight(1f)
             .background(
-                Brush.linearGradient(
+                Brush.horizontalGradient(
                     listOf(
                         color.copy(alpha = 0f), color.copy(alpha = 1f)
                     )
@@ -89,6 +89,75 @@ fun AlphaSlider(
                     radius = size.height / 2 * 0.8f,
                     center = Offset(innerAlpha * size.width, size.height / 2f),
                     style = Stroke(width = size.height / 2 * 0.4f)
+                )
+            })
+    }
+}
+
+@Composable
+fun AlphaVerticalSlider(
+    color: Color, //color without alpha
+    alpha: Float,
+    onAlphaChanged: (Float) -> Unit
+) {
+
+    var innerAlpha by remember {
+        mutableFloatStateOf(alpha)
+    }
+
+    Row(
+        modifier = Modifier
+            .fillMaxHeight()
+            .pointerInput(key1 = Unit) {
+                detectTapGestures(
+                    onPress = { offset ->
+                        innerAlpha = (offset.y / size.height).coerceIn(0f, 1f)
+                        onAlphaChanged(innerAlpha)
+                    }
+                )
+            }
+            .pointerInput(Unit) {
+                detectDragGestures() { change, dragAmount ->
+                    innerAlpha = (change.position.y / size.height).coerceIn(0f, 1f)
+                    onAlphaChanged(innerAlpha)
+                }
+            }
+            .padding(16.dp, 24.dp)
+            .height(sliderHeight),
+        horizontalArrangement = Arrangement.Center
+    ) {
+        Canvas(modifier = Modifier
+            .fillMaxWidth()
+            .weight(1f)
+            .background(
+                Brush.verticalGradient(
+                    listOf(
+                        color.copy(alpha = 0f), color.copy(alpha = 1f)
+                    )
+                )
+            ),
+            onDraw = {
+                drawArc(
+                    color = Color.Transparent, //left
+                    startAngle = 180f,
+                    sweepAngle = 180f,
+                    useCenter = true,
+                    topLeft = Offset(0f, -size.width / 2),
+                    size = Size(size.width, size.width)
+                )
+                drawArc(
+                    color = color.copy(alpha = 1f), //right
+                    startAngle = 0f,
+                    sweepAngle = 180f,
+                    useCenter = true,
+                    topLeft = Offset(0f, size.height - size.width / 2),
+                    size = Size(size.width, size.width)
+                )
+                drawCircle(
+                    Color.White,
+                    radius = size.width / 2 * 0.8f,
+                    center = Offset(size.width / 2f, alpha * size.height),
+                    style = Stroke(width = size.width / 2 * 0.4f)
                 )
             })
     }
