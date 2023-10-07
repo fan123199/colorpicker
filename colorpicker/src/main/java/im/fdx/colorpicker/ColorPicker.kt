@@ -170,7 +170,7 @@ fun ColorPickerCircle(
 
     BoxWithConstraints(modifier) {
         println("maxH $maxHeight,maxW $maxWidth,minH  $minHeight,minW  $minWidth")
-        if(maxHeight > 400.dp) {
+        if(maxHeight > 450.dp) {
             Column {
 
                 ColorWheel(
@@ -301,7 +301,7 @@ fun ColorPickerRectHsv(
 
 
     BoxWithConstraints(modifier) {
-        if(maxHeight > 400.dp) {
+        if(maxHeight > 450.dp) {
             Column {
 
                 ColorRectPanel(modifier = Modifier

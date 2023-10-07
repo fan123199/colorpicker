@@ -71,7 +71,7 @@ afterEvaluate {
                 from components.release
                 groupId = 'im.fdx'
                 artifactId = 'colorpicker'
-                version = '1.0.3'
+                version = '1.0.8'
             }
         }
     }
